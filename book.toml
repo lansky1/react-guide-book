@@ -1,0 +1,16 @@
+[book]
+title = "React from the Ground Up"
+authors = []
+description = "A Practical Guide to Modern Web Development"
+language = "en"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/lansky1/react-guide-book"
+
+[output.html.search]
+enable = true
