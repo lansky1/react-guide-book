@@ -18,13 +18,12 @@
 
 - [Development Tools](./ch07-development-tools.md)
 - [HTML for React Developers](./ch08-html-for-react.md)
-- [Practical Lessons](./ch09-practical-lessons.md)
 
 # Styling
 
-- [Styling React Projects](./ch10-styling.md)
+- [Styling React Projects](./ch09-styling.md)
 
 # Reference
 
-- [Appendix](./ch11-appendix.md)
-- [Raw Notes](./ch12-raw-notes.md)
+- [Appendix](./ch10-appendix.md)
+- [Raw Notes](./ch11-raw-notes.md)

@@ -1,19 +1,24 @@
 # HTML for React Developers
 
-```text
-The <pre> HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced font.
-```
+This chapter covers HTML elements and patterns commonly used in React applications.
 
-## Dialog and Modal Elements
+---
 
-**`<dialog>` Element:**
-- Native HTML element for dialogs/modals
-- **Invisible by default** - requires `open` attribute or `.showModal()` method to display
+## The `<dialog>` Element
+
+The native HTML `<dialog>` element provides built-in support for dialogs and modals.
+
+### Visibility
+
+- **Invisible by default** — requires the `open` attribute or `.showModal()` method to display
 - Two display modes:
-  - `<dialog open>` - displays as regular element in document flow
-  - `dialog.showModal()` - displays as modal with backdrop
+  | Mode | Usage | Behavior |
+  |------|-------|----------|
+  | `<dialog open>` | Inline attribute | Displays in normal document flow |
+  | `dialog.showModal()` | JavaScript method | Displays as modal with backdrop |
 
-**Form Integration:**
+### Basic Example
+
 ```jsx
 <dialog className="result-modal" open>
   <h2>Dialog Title</h2>
@@ -23,35 +28,17 @@ The <pre> HTML element represents preformatted text which is to be presented exa
 </dialog>
 ```
 
-**Key points:**
-- `<form method="dialog">` automatically closes the dialog when submitted (no JavaScript needed)
-- Button inside form with `method="dialog"` triggers dialog close on click
-- Alternative: use refs with `.showModal()` and `.close()` methods for programmatic control
+### Form Integration
 
-## Form onSubmit
+Using `<form method="dialog">` inside a dialog provides automatic close behavior:
 
-The `onSubmit` prop handles form submission events.
+- The dialog closes when the form is submitted (no JavaScript needed)
+- Any button inside the form triggers the close on click
+- Alternative: use refs with `.showModal()` and `.close()` for programmatic control
 
-```jsx
-function handleSubmit(event) {
-  event.preventDefault();  // Prevent page reload
-  // Access form data
-}
+### The `onClose` Event
 
-<form onSubmit={handleSubmit}>
-  <input name="email" />
-  <button type="submit">Submit</button>
-</form>
-```
-
-**Key points:**
-- `event.preventDefault()` stops the default browser behavior (page reload/navigation)
-- Fires when: submit button clicked, or Enter pressed in an input field
-- Access inputs via `event.target.elements` or controlled state
-
-## Dialog onClose
-
-The `onClose` event fires when a `<dialog>` is closed (via ESC key, `method="dialog"` form, or `.close()` call).
+The `onClose` event fires when a `<dialog>` is closed — regardless of *how* it was closed (ESC key, `method="dialog"` form, or `.close()` call).
 
 ```jsx
 function handleClose() {
@@ -66,7 +53,63 @@ function handleClose() {
 </dialog>
 ```
 
-**Key points:**
-- Fires regardless of *how* the dialog was closed
-- Useful for cleanup, resetting state, or triggering side effects
-- Does NOT fire if dialog is hidden by removing `open` attribute directly
+> ⚠️ **Note:** `onClose` does NOT fire if the dialog is hidden by removing the `open` attribute directly.
+
+---
+
+## Form Handling with `onSubmit`
+
+The `onSubmit` prop handles form submission events in React.
+
+```jsx
+function handleSubmit(event) {
+  event.preventDefault();  // Prevent page reload
+  // Access form data
+}
+
+<form onSubmit={handleSubmit}>
+  <input name="email" />
+  <button type="submit">Submit</button>
+</form>
+```
+
+### Key Points
+
+| Behavior | Description |
+|----------|-------------|
+| `event.preventDefault()` | Stops the default browser behavior (page reload/navigation) |
+| Triggers | Submit button clicked, or Enter pressed in an input field |
+| Accessing data | Use `event.target.elements` or controlled state |
+
+### Button Types in Forms
+
+In HTML forms, **all buttons default to `type="submit"`**. If you have a button that should NOT submit the form, you must explicitly set `type="button"`.
+
+```jsx
+<form onSubmit={handleSubmit}>
+  <button type="button" onClick={handleCancel}>
+    Cancel
+  </button>
+  <button type="submit">
+    Save
+  </button>
+</form>
+```
+
+> ⚠️ **Common bug:** Without `type="button"` on the Cancel button, clicking it will submit the form instead of executing the `onClick` handler.
+
+---
+
+## The `<pre>` Element
+
+The `<pre>` HTML element represents **preformatted text** — content presented exactly as written in the HTML file. The text is typically rendered using a monospaced font.
+
+```jsx
+<pre>
+  Line 1
+    Indented line 2
+  Line 3
+</pre>
+```
+
+Use `<pre>` when whitespace and line breaks are meaningful (e.g., code snippets, ASCII art).

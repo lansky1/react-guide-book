@@ -5,6 +5,9 @@
 - No import/export support
 - Requires manual `defer` attribute when needed
 - Scripts load in order they appear in HTML
+- Import statements don't work — only the loaded script will execute
+
+> 💡 **Tip:** Since HTML renders after the script in `<head>`, use the `defer` attribute or place the script at the end of `<body>`.
 
 ## ES Modules
 
