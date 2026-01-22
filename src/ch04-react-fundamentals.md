@@ -361,6 +361,19 @@ console.log(items.toString()); // "apple,banana,orange" (with commas)
 
 **Why?** JSX is designed for rendering lists of React elements. When given an array, it concatenates all elements for rendering convenience.
 
+**The `.map()` method provides two parameters automatically:**
+
+```jsx
+array.map((item, index) => ...)
+//         ^^^^  ^^^^^
+//         1st   2nd parameter
+```
+
+- First parameter: the current item in the array
+- Second parameter: the index/position of that item
+
+The `index` is useful for setting the `key` prop. However, using `index` as a key isn't ideal if you'll be reordering, filtering, or deleting items. For simple lists where items are only added to the end, `index` works fine.
+
 ## Build Process
 
 React applications handle scripts differently from traditional web pages:

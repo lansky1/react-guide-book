@@ -86,6 +86,28 @@ const element = ref.current ?? document.body;
 
 - `+` before a variable converts it to a number.
 
+## Method Calls Need Parentheses
+
+**Common mistake: `.trim` vs `.trim()`**
+
+Always include parentheses `()` when calling methods:
+
+```js
+// ❌ WRONG - checks the length of the function itself
+if (title.trim.length === 0) {
+    alert("Title is required!");
+}
+// .trim without () is just a reference to the function
+// Functions have a .length property (number of parameters), not the trimmed string
+
+// ✅ CORRECT - calls trim() and checks the trimmed string length
+if (title.trim().length === 0) {
+    alert("Title is required!");
+}
+```
+
+**The rule:** Method calls need `()`. Without parentheses, you're referencing the function itself, not executing it.
+
 ## Arrow Function Syntax Patterns
 
 ### Shortcuts

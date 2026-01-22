@@ -26,4 +26,3 @@
 # Reference
 
 - [Appendix](./ch10-appendix.md)
-- [Raw Notes](./ch11-raw-notes.md)

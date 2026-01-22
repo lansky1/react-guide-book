@@ -71,6 +71,22 @@ Use functional updates when the new state depends on the previous state:
 setValue(prev => (prev === "X" ? "O" : "X"));
 ```
 
+**When to use each approach:**
+
+- Pass a **function** when the new state depends on the previous state
+- Pass a **value** when the new state is independent of previous state
+
+```jsx
+// ✅ Function - depends on previous state
+setCount(prev => prev + 1);
+setItems(prev => [...prev, newItem]);
+
+// ✅ Value - independent, replacing entirely
+setName("John");
+setIsOpen(true);
+setItems([1, 2, 3]);  // Complete replacement
+```
+
 See [Appendix](./ch11-appendix.md) for how state batching works.
 
 ## useRef
