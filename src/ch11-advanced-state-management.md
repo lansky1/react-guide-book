@@ -18,3 +18,6 @@
   </Middle>
 </Parent>
 ```
+
+## Component Composition
+
