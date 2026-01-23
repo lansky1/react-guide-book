@@ -120,6 +120,13 @@ function Cart() {
 | Provider without `value` prop | `undefined` (breaks!) ✗ |
 | Provider with `value` prop | That value used ✓ |
 
-**Key insight 1**: Default value is a fallback only when no Provider exists. Provider must always have a `value` prop.
+### Key Insights
 
-**Key insight 2**: The Provider's `value` prop connects context to state, enabling reactivity. Without a Provider, you only get the static default.
+1. **Default Value = Fallback Only**  
+   The default value only applies when no Provider exists in the component tree. Once you add a Provider, you must always include the `value` prop.
+
+2. **Provider Enables Reactivity**  
+   The Provider's `value` prop links context to state, making components re-render when values change. Without a Provider, you only get the static default value.
+
+3. **Default Value Powers IntelliSense**  
+   The structure defined in the default value enables IDE autocomplete and type hints, even though runtime values come from the Provider.
