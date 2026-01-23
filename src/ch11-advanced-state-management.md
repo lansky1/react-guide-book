@@ -93,4 +93,33 @@ export default CartContext;
 
 ### Consuming Context
 
-*(Coming up next)*
+**Two hooks available**:
+- `useContext` — standard hook (all React versions)
+- `use` — React 19+, more flexible (can be used inside if blocks)
+
+```jsx
+import { useContext } from "react";
+import { CartContext } from "../store/shopping-cart-context";
+
+function Cart() {
+  // Option 1: Store in a variable
+  const cartCtx = useContext(CartContext);
+  
+  // Option 2: Destructure directly
+  const { items, addItem } = useContext(CartContext);
+  
+  return <p>{items.length} items</p>;
+}
+```
+
+### Default Value vs Provider Value
+
+| Scenario | Result |
+|----------|--------|
+| No Provider in tree | Default value used ✓ |
+| Provider without `value` prop | `undefined` (breaks!) ✗ |
+| Provider with `value` prop | That value used ✓ |
+
+**Key insight 1**: Default value is a fallback only when no Provider exists. Provider must always have a `value` prop.
+
+**Key insight 2**: The Provider's `value` prop connects context to state, enabling reactivity. Without a Provider, you only get the static default.
