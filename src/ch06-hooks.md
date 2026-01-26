@@ -87,7 +87,27 @@ setIsOpen(true);
 setItems([1, 2, 3]);  // Complete replacement
 ```
 
-See [Appendix](./ch11-appendix.md) for how state batching works.
+See [Rendering Model](./ch05-rendering-model.md) for how state batching works.
+
+### Understanding State Updates (Mental Model)
+
+Think of state updates like this:
+
+1. `setCount` with a value is like replacing a photo with a new one.
+2. `setCount` with a function is like giving React instructions on how to modify the photo, no matter when it does the job.
+3. The reason functions behave differently is because React does NOT run them immediately.
+4. React runs the functions one after another, and each one sees the most recent state.
+
+**State Updates with Previous Value:**
+When updating state based on the previous value, **always** pass a function to the state updating function.
+
+```jsx
+setIsEditing(!isEditing); // isEditing is false, sets to true
+setIsEditing(!isEditing); // isEditing is STILL false here, sets to true
+// Result: Both updates use the same stale value, so it only toggles once
+```
+
+The rendering happens after the function executes completely, so both calls access the same value if you don't use the functional update form.
 
 ## useRef
 
@@ -146,6 +166,37 @@ function Timer() {
   );
 }
 ```
+
+#### 3. Timer with State Updates
+
+A common pattern combining `useRef` for interval storage with `useState` for display:
+
+```jsx
+function Timer() {
+  const intervalRef = useRef(null);
+  const [seconds, setSeconds] = useState(0);
+
+  const start = () => {
+    intervalRef.current = setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+  };
+
+  const stop = () => {
+    clearInterval(intervalRef.current);
+  };
+
+  return (
+    <>
+      <p>{seconds}s</p>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </>
+  );
+}
+```
+
+**⚠️ Important:** Always clear intervals when components unmount to prevent memory leaks and unexpected behavior.
 
 ### useRef vs useState
 

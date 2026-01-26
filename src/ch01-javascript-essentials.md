@@ -263,31 +263,297 @@ setInterval(() => {
 }, 1000);
 ```
 
-**Common React pattern with useRef:**
+**⚠️ Important:** Always clear intervals when components unmount to prevent memory leaks and unexpected behavior. See the [Hooks chapter](./ch06-hooks.md) for React-specific patterns using `useRef` with intervals.
 
-```jsx
-function Timer() {
-  const intervalRef = useRef(null);
-  const [seconds, setSeconds] = useState(0);
+## DOM Manipulation
 
-  const start = () => {
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => prev + 1);
-    }, 1000);
-  };
+### Selecting Elements
 
-  const stop = () => {
-    clearInterval(intervalRef.current);
-  };
+**`querySelector()`**: Returns the **first** element that matches a CSS selector
 
-  return (
-    <>
-      <p>{seconds}s</p>
-      <button onClick={start}>Start</button>
-      <button onClick={stop}>Stop</button>
-    </>
-  );
-}
+```javascript
+document.querySelector(".class-name"); // First element with class
+document.querySelector("#id"); // Element by ID
+document.querySelector("div > p"); // First p inside a div
 ```
 
-**⚠️ Important:** Always clear intervals when components unmount to prevent memory leaks and unexpected behavior.
+**`querySelectorAll()`**: Returns **all** matching elements as a NodeList
+
+```javascript
+document.querySelectorAll(".item"); // All elements with class 'item'
+```
+
+> **NodeList**: Array-like but not an array. Has `.forEach()` and `.length`, but lacks `.map()` / `.filter()`. Convert with `Array.from(nodeList)` or `[...nodeList]` if needed.
+
+### Content Properties
+
+**⚠️ XSS Warning:** Never insert user input using `innerHTML`.
+
+- **`innerHTML`**: Use when you need to **read or write HTML tags**
+
+  - Example: `div.innerHTML = '<strong>Bold</strong> text';`
+
+- **`textContent`**: Use when you only need **plain text**. It's fast and safe (reads raw text directly)
+
+  - Example: `div.textContent = 'Just plain text';`
+
+- **`innerText`**: Use only if you need the **visible text** (what the user sees). Slower because it checks CSS, triggers layout, and skips hidden elements
+
+- **`outerHTML`**: Use to **replace the whole element** with new HTML
+
+  - Example: `div.outerHTML = '<p>The div is now a paragraph.</p>';`
+
+- **`outerText`**: When you change it, it **replaces the entire element with just plain text**, destroying the original element
+
+> **Simple rule:** `*HTML` properties = tags are **rendered**. `*Text` properties = tags are shown **as-is** (plain text).
+
+### Security Considerations
+
+> **⚠️ Security Warning:** If you use `innerHTML` with text from a user (like a comment), a hacker could write `<script>alert('hacked!')</script>`. Your webpage would run that script. This is called a **Cross-Site Scripting (XSS)** attack.
+
+## Data Structures
+
+**Maps**: Use `.get(key)` to retrieve values
+
+```javascript
+const map = new Map();
+map.get(key); // ✓ Correct
+map[key]; // ✗ Won't work - returns undefined
+```
+
+**Objects**: Use bracket notation or dot notation
+
+```javascript
+const obj = { name: "John" };
+obj["name"]; // ✓ Works
+obj.name; // ✓ Works
+```
+
+## Destructuring
+
+Extract values from arrays or objects into individual variables using a concise syntax. Other languages refer to this as `pattern matching`.
+
+**Array Destructuring:**
+
+```javascript
+const [first, second] = [1, 2, 3];
+// first = 1, second = 2
+
+const [a, , c] = [1, 2, 3]; // Skip elements
+// a = 1, c = 3
+```
+
+**Object Destructuring:**
+
+```javascript
+const { name, age } = { name: "John", age: 30 };
+// name = 'John', age = 30
+
+const { name: userName, age } = { name: "John", age: 30 }; // Rename
+// userName = 'John', age = 30
+```
+
+**Function Parameters:**
+
+```javascript
+function greet({ name, age }) {
+  console.log(`${name} is ${age}`);
+}
+greet({ name: "John", age: 30 }); // John is 30
+
+// this is cleaner in handling optional params and for adding new params
+```
+
+> **Note:** Parameter names must match object property names. To rename: `{ name: firstName }` extracts `name` as `firstName`.
+
+**Array vs Object Destructuring:**
+
+Arrays are position-based (names can be anything):
+
+```javascript
+const [first, second] = [1, 2, 3];
+// first = 1, second = 2 (names don't matter)
+```
+
+Objects are name-based (names must match properties):
+
+```javascript
+const { age, name } = { name: "John", age: 30 };
+// age = 30, name = 'John' (order doesn't matter, names must match)
+
+const { x } = { name: "John" };
+// x = undefined (no property named 'x')
+```
+
+## Spread Operator
+
+Copy or combine arrays/objects using `...` syntax.
+
+**Arrays:**
+
+```javascript
+const arr1 = [1, 2];
+const arr2 = [3, 4];
+const combined = [...arr1, ...arr2]; // [1, 2, 3, 4]
+const copy = [...arr1]; // [1, 2]
+```
+
+**Objects:**
+
+```javascript
+const obj1 = { name: "John" };
+const obj2 = { age: 30 };
+const merged = { ...obj1, ...obj2 }; // { name: 'John', age: 30 }
+```
+
+**vs `concat()`:** Spread is more flexible (insert anywhere), concat always appends to end.
+
+**In JSX (spreading props):**
+
+```jsx
+const props = { title: "Components", description: "...", image: "..." };
+
+// With spread - unpacks object into individual props
+<CoreConcept {...props} />
+// Equivalent to:
+<CoreConcept title="Components" description="..." image="..." />
+
+// Without spread - passes entire object as single prop
+<CoreConcept concept={props} />
+// Component must access: concept.title, concept.description, etc.
+```
+
+**Analogy:** Think of it like unpacking a box:
+
+- **Without `...`**: You hand someone the entire box
+- **With `...`**: You unpack the box and hand them each item separately
+
+### Spread Operator with Computed Property Names
+
+**Pattern:**
+```javascript
+setPlayers(prevPlayer => {
+  return {
+    ...prevPlayer,
+    [symbol]: newName
+  }
+});
+```
+
+**How it works:**
+
+1. **`...prevPlayer`** - Spread operator copies all properties from the previous state object into a new object
+   ```javascript
+   prevPlayer = { X: "Player 1", O: "Player 2" }
+   { ...prevPlayer } // Creates NEW object: { X: "Player 1", O: "Player 2" }
+   ```
+
+2. **`[symbol]: newName`** - Computed property name (brackets make it dynamic)
+   - If `symbol = "X"` and `newName = "Alice"`, this becomes `X: "Alice"`
+   - If `symbol = "O"` and `newName = "Bob"`, this becomes `O: "Bob"`
+
+3. **Last property wins** - When you have duplicate keys, the last one overwrites:
+   ```javascript
+   {
+     X: "Player 1",  // From spread
+     O: "Player 2",  // From spread
+     X: "Alice"      // Overwrites the X from spread
+   }
+   // Result: { X: "Alice", O: "Player 2" }
+   ```
+
+## Shallow vs Deep Copy
+
+**Shallow Copy** creates a new outer container but keeps references to the same inner objects.
+
+```javascript
+// 2D array example
+const original = [
+  [1, 2, 3],  // Memory address: 0x001
+  [4, 5, 6],  // Memory address: 0x002
+];
+
+const shallow = [...original];
+
+// What happened:
+shallow !== original              // ✓ Different outer arrays
+shallow[0] === original[0]        // ✗ SAME inner arrays (still 0x001)
+shallow[1] === original[1]        // ✗ SAME inner arrays (still 0x002)
+
+// The problem:
+shallow[0][0] = 99;
+console.log(original[0][0]);      // 99 - Original mutated!
+```
+
+**Deep Copy** creates new containers at all levels - completely independent copies.
+
+```javascript
+// Deep copy with map
+const deep = original.map(row => [...row]);
+
+// What happened:
+deep !== original                 // ✓ Different outer arrays  
+deep[0] !== original[0]           // ✓ Different inner arrays (new address)
+deep[1] !== original[1]           // ✓ Different inner arrays (new address)
+
+// Now safe:
+deep[0][0] = 99;
+console.log(original[0][0]);      // 1 - Original unchanged!
+```
+
+**Rule of thumb:**
+- **Shallow copy**: Use for flat arrays/objects (one level)
+- **Deep copy**: Use for nested structures (arrays of arrays, nested objects)
+
+**Why `.map()` creates a new array:**
+
+The `.map()` method **always returns a new array** - you don't need to spread the result.
+
+**In deep copy context:**
+
+```javascript
+// ✓ Correct - .map() creates outer array
+const deep = gameBoardState.map(row => [...row]);
+
+// ✗ Redundant - extra spread creates unnecessary copy
+const deep = [...gameBoardState.map(row => [...row])];
+```
+
+## Rest Operator
+
+Collect remaining elements into a single variable using `...` syntax (opposite of spread).
+
+**With Arrays:**
+
+```javascript
+const [first, second, ...rest] = [1, 2, 3, 4, 5];
+// first = 1, second = 2, rest = [3, 4, 5]
+```
+
+**With Objects:**
+
+```javascript
+const { name, age, ...otherInfo } = {
+  name: "John",
+  age: 30,
+  city: "NYC",
+  country: "USA",
+};
+// name = 'John', age = 30
+// otherInfo = { city: 'NYC', country: 'USA' }
+```
+
+**In Function Parameters:**
+
+```javascript
+function sum(first, ...numbers) {
+  // first = 1, numbers = [2, 3, 4]
+  return first + numbers.reduce((a, b) => a + b, 0);
+}
+sum(1, 2, 3, 4); // 10
+```
+
+**Spread vs Rest:** Same syntax `...`, different purpose:
+
+- **Spread**: Expands an array/object into individual elements
+- **Rest**: Collects multiple elements into an array/object
