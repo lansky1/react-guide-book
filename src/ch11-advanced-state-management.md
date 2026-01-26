@@ -156,3 +156,143 @@ function Cart() {
 
 3. **Default Value Powers IntelliSense**  
    The structure defined in the default value enables IDE autocomplete and type hints, even though runtime values come from the Provider.
+
+## useReducer Hook
+
+**What**: An alternative to `useState` for managing complex state logic. Instead of updating state directly, you dispatch actions to a reducer function that determines how state changes.
+
+**When to Use**: 
+- State has complex update logic (multiple related values)
+- Next state depends on previous state
+- State transitions follow specific patterns/rules
+- Multiple actions can update the same state
+
+### Basic Structure
+
+```jsx
+const [state, dispatch] = useReducer(reducerFunction, initialState);
+```
+
+- **state**: Current state value
+- **dispatch**: Function to trigger state updates by sending actions
+- **reducerFunction**: Pure function that calculates new state
+- **initialState**: Starting state value
+
+### Reducer Function
+
+A pure function that takes the current state and an action, then returns the new state:
+
+```jsx
+function reducerFunction(state, action) {
+  // Determine what to do based on action.type
+  if (action.type === 'INCREMENT') {
+    return { count: state.count + 1 };
+  }
+  if (action.type === 'DECREMENT') {
+    return { count: state.count - 1 };
+  }
+  return state; // Return unchanged state for unknown actions
+}
+```
+
+**Naming Convention**: Use SCREAMING_SNAKE_CASE for action types to distinguish them as constants.
+
+### Actions
+
+Objects that describe what happened. Typically have a `type` property and optional payload data:
+
+```jsx
+// Simple action (just type)
+dispatch({ type: 'INCREMENT' });
+
+// Action with payload
+dispatch({ 
+  type: 'ADD_ITEM', 
+  payload: { id: 1, name: 'Product' } 
+});
+```
+
+### Complete Example
+
+```jsx
+import { useReducer } from 'react';
+
+// Initial state
+const initialState = { count: 0 };
+
+// Reducer function
+function counterReducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(counterReducer, initialState);
+  
+  return (
+    <>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+      <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+      <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
+    </>
+  );
+}
+```
+
+### Key Rules
+
+1. **Reducer Must Be Pure**: Same inputs always produce the same output, no side effects
+2. **Never Mutate State**: Always return a new state object
+3. **Return State for Unknown Actions**: Prevents crashes from typos
+4. **State is Immutable**: Use spread operators or array methods that return new references
+
+### useState vs useReducer
+
+| useState | useReducer |
+|----------|-----------|
+| Simple state (strings, numbers, booleans) | Complex state (objects, arrays) |
+| Independent state updates | Related state updates |
+| Direct state manipulation | Centralized update logic |
+| `setState(newValue)` | `dispatch({ type: 'ACTION' })` |
+
+### Common Pattern: State + Payload
+
+```jsx
+function shoppingCartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_ITEM':
+      return {
+        items: [...state.items, action.payload]
+      };
+    case 'REMOVE_ITEM':
+      return {
+        items: state.items.filter(item => item.id !== action.payload.id)
+      };
+    case 'UPDATE_QUANTITY':
+      return {
+        items: state.items.map(item =>
+          item.id === action.payload.id
+            ? { ...item, quantity: action.payload.quantity }
+            : item
+        )
+      };
+    default:
+      return state;
+  }
+}
+```
+
+**Benefits**:
+- All state logic is centralized in one function
+- Easy to test reducer independently
+- Action types make code self-documenting
+- Easier to debug state transitions
