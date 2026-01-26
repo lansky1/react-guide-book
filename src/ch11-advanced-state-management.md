@@ -93,9 +93,12 @@ export default CartContext;
 
 ### Consuming Context
 
-**Two hooks available**:
-- `useContext` — standard hook (all React versions)
+**Three ways to consume context**:
+- `useContext` — standard hook (React 16.8+)
 - `use` — React 19+, more flexible (can be used inside if blocks)
+- `.Consumer` — legacy render prop pattern (pre-hooks)
+
+#### Modern Approach: Hooks
 
 ```jsx
 import { useContext } from "react";
@@ -111,6 +114,29 @@ function Cart() {
   return <p>{items.length} items</p>;
 }
 ```
+
+#### Legacy Approach: Consumer Component
+
+**Before hooks existed**, you had to use the `.Consumer` property with a render prop pattern:
+
+```jsx
+import { CartContext } from "../store/shopping-cart-context";
+
+function Cart() {
+  return (
+    <CartContext.Consumer>
+      {(cartCtx) => {
+        return <p>{cartCtx.items.length} items</p>;
+      }}
+    </CartContext.Consumer>
+  );
+}
+```
+
+**Why it's outdated**: 
+- More verbose than `useContext`
+- Creates nesting hell with multiple contexts
+- Can't be used in class component lifecycle methods
 
 ### Default Value vs Provider Value
 
